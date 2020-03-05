@@ -36,8 +36,9 @@ class dialog(QDialog):
         self.setPalette(pal)
 
         # creating models
-        button_accept = QPushButton(button_texts[0], self)
-        button_reject = QPushButton(button_texts[1], self)
+        if len(button_texts) == 2:
+            button_accept = QPushButton(button_texts[0], self)
+            button_reject = QPushButton(button_texts[1], self)
         self.text_field = QLineEdit(self)
         self.error_label = QLabel(self)
 
@@ -50,17 +51,19 @@ class dialog(QDialog):
         self.error_label.setStyleSheet("color: red")
 
         # arrange modules in the window
-        button_accept.move(window_width/2, window_height/1.5)
-        button_reject.move(window_width/3.5, window_height/1.5)
+        if len(button_texts) == 2:
+            button_accept.move(window_width/2, window_height/1.5)
+            button_reject.move(window_width/3.5, window_height/1.5)
         self.text_field.setFixedWidth(self.width/5)
         self.text_field.move(window_width/10, window_height/3)
         self.error_label.move(window_width/1.45, window_height/1.5)
+    
+        # event listeners
+        if len(button_texts) == 2:
+            button_accept.clicked.connect(self.button_accept_action)
+            button_reject.clicked.connect(self.button_reject_action)
+        self.keyPressEvent = self.enter_key_pressed
 
-        # click event listener
-        button_accept.clicked.connect(self.button_accept_action)
-        button_reject.clicked.connect(self.button_reject_action)
-
-        # self.showFullScreen()
         self.exec_()
         return self.input_text
 
@@ -72,14 +75,21 @@ class dialog(QDialog):
         else:
             self.accept()
             self.input_text = self.text_field.text()
-            #return self.text_field.text()
 
     @QtCore.pyqtSlot()
     def button_reject_action(self):
         self.reject()
+    
+    @QtCore.pyqtSlot()
+    def enter_key_pressed(self, e):
+        if e.key() == QtCore.Qt.Key_Enter or e.key() == QtCore.Qt.Key_Return:
+            self.accept()
+            self.input_text = self.text_field.text()
+        elif e.key() == QtCore.Qt.Key_Escape:
+            self.reject()
 
 
-def start_gui(button_text=["Confirm","Cancel"], error_text="No entry given") -> str:
+def start_gui(button_text=[], error_text="No entry given") -> str:
     '''
         Input: list [accept_button_text, reject_button_text]
                str error_text
@@ -91,6 +101,4 @@ def start_gui(button_text=["Confirm","Cancel"], error_text="No entry given") -> 
     input_text = inputd.dialog_layout(button_text, error_text)
     app.closeAllWindows()
     app.quit()
-    #sys.exit(0)
-    # sys.exit(app.exec_())
     return input_text
