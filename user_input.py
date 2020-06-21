@@ -39,6 +39,8 @@ class dialog(QDialog):
         if len(button_texts) == 2:
             button_accept = QPushButton(button_texts[0], self)
             button_reject = QPushButton(button_texts[1], self)
+        else:
+            button_accept = QPushButton(button_texts[0], self)
         self.text_field = QLineEdit(self)
         self.error_label = QLabel(self)
 
@@ -54,6 +56,8 @@ class dialog(QDialog):
         if len(button_texts) == 2:
             button_accept.move(window_width/2, window_height/1.5)
             button_reject.move(window_width/3.5, window_height/1.5)
+        else:
+            button_accept.move(window_width/2, window_height/1.5)
         self.text_field.setFixedWidth(self.width/5)
         self.text_field.move(window_width/10, window_height/3)
         self.error_label.move(window_width/1.45, window_height/1.5)
@@ -62,6 +66,8 @@ class dialog(QDialog):
         if len(button_texts) == 2:
             button_accept.clicked.connect(self.button_accept_action)
             button_reject.clicked.connect(self.button_reject_action)
+        else:
+            button_accept.clicked.connect(self.button_accept_action)
         self.keyPressEvent = self.enter_key_pressed
 
         self.exec_()
@@ -89,7 +95,7 @@ class dialog(QDialog):
             self.reject()
 
 
-def start_gui(button_text=[], error_text="No entry given") -> str:
+def start_gui(button_text=[], error_text="No entry given", title = "No title given") -> str:
     '''
         Input: list [accept_button_text, reject_button_text]
                str error_text
@@ -97,7 +103,7 @@ def start_gui(button_text=[], error_text="No entry given") -> str:
     app = QApplication([])
     screen_res = app.desktop().screenGeometry()
     width, height = screen_res.width(), screen_res.height()
-    inputd = dialog(width, height, "This is a title")
+    inputd = dialog(width, height, title)
     input_text = inputd.dialog_layout(button_text, error_text)
     app.closeAllWindows()
     app.quit()
